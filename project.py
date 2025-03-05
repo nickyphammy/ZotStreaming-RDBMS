@@ -1,39 +1,39 @@
 import sys
 
-def import_data():
+def import_data(args):
     print("running import_data")
 
-def insertViewer():
+def insertViewer(args):
     print("running insertViewer")
 
-def addGenre():
+def addGenre(args):
     print("running addGenre")
 
-def deleteViewer():
+def deleteViewer(args):
     print("running deleteViewer")
 
-def insertMovie():
+def insertMovie(args):
     print("running insertMovie")
 
-def insertSession():
+def insertSession(args):
     print("running insertSession")
 
-def updateRelease():
+def updateRelease(args):
     print("running updateRelease")
 
-def listReleases():
+def listReleases(args):
     print("running listReleases")
 
-def popularRelease():
+def popularRelease(args):
     print("running popularRelease")
 
-def releaseTitle():
+def releaseTitle(args):
     print("running releaseTitle")
 
-def activeViewer():
+def activeViewer(args):
     print("running activeViewer")
 
-def videosViewed():
+def videosViewed(args):
     print("running videosViewed")
 
 
@@ -43,29 +43,29 @@ if __name__ == "__main__":
     func_args = sys.argv[2:]
 
     if func_name == "import_data":
-        import_data()
+        import_data(func_args)
     elif func_name == "insertViewer":
-        insertViewer()
+        insertViewer(func_args)
     elif func_name == "addGenre":
-        addGenre()
+        addGenre(func_args)
     elif func_name == "deleteViewer":
-        deleteViewer()
+        deleteViewer(func_args)
     elif func_name == "insertMovie":
-        insertMovie()
+        insertMovie(func_args)
     elif func_name == "insertSession":
-        insertSession()
+        insertSession(func_args)
     elif func_name == "updateRelease":
-        updateRelease()
+        updateRelease(func_args)
     elif func_name == "listReleases":
-        listReleases()
+        listReleases(func_args)
     elif func_name == "popularRelease":
-        popularRelease()
+        popularRelease(func_args)
     elif func_name == "releaseTitle":
-        releaseTitle()
+        releaseTitle(func_args)
     elif func_name == "activeViewer":
-        activeViewer()
+        activeViewer(func_args)
     elif func_name == "videosViewed":
-        videosViewed()
+        videosViewed(func_args)
     else:
         print("Invalid function name selected!")
 
