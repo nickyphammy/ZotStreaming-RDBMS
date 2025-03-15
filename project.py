@@ -23,7 +23,7 @@ def get_db_connection():
 def import_data(args) -> bool:
     if len(args) != 1:
         print("Fail")
-        return
+        return False
     
     folder_name = args[0]
     
@@ -37,7 +37,7 @@ def import_data(args) -> bool:
     # Check if folder exists
     if not os.path.exists(folder_name):
         print("Fail - Folder not found")
-        return
+        return False
     
     # Make sure all required CSV files exist
     tables = ["users", "producers", "viewers", "releases", "movies", "series", "videos", "sessions", "reviews"]
@@ -45,7 +45,7 @@ def import_data(args) -> bool:
         file_path = os.path.join(folder_name, f"{table}.csv")
         if not os.path.exists(file_path):
             print(f"Fail - File not found: {file_path}")
-            return
+            return False
     
     try:
         conn = get_db_connection()
@@ -183,9 +183,11 @@ def import_data(args) -> bool:
         
         conn.commit()
         print("Success")
+        return True
     except Exception as e:
         conn.rollback()
         print(f"Fail - Exception: {str(e)}")
+        return False
     finally:
         if 'cursor' in locals():
             cursor.close()
@@ -231,7 +233,7 @@ if __name__ == "__main__":
     func_name = sys.argv[1]
     func_args = sys.argv[2:]
 
-    if func_name == "import_data":
+    if func_name == "import":
         import_data(func_args)
     elif func_name == "insertViewer":
         insertViewer(func_args)
