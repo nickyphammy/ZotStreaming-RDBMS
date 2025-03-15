@@ -309,7 +309,43 @@ def addGenre(args) -> bool:
         conn.close()
 
 def deleteViewer(args) -> bool:
-    print("running deleteViewer")
+    if len(args) < 1:
+        print("Fail")
+        return False
+    
+    # Parse arguments
+    uid = int(args[0])
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Start transaction, when calling start_transaction, groups the operations and ensures that all or none of the transactions take effect.
+        conn.start_transaction()
+        
+        # Delete from viewers table
+        delete_viewer_query = "DELETE FROM viewers WHERE uid = %s"
+        cursor.execute(delete_viewer_query, (uid,))
+        
+        # Delete from users table
+        delete_user_query = "DELETE FROM users WHERE uid = %s"
+        cursor.execute(delete_user_query, (uid,))
+        
+        # Commit the transaction
+        conn.commit()
+        print("Success")
+        return True
+    
+    except mysql.connector.Error as err:
+        # Rollback in case of error
+        conn.rollback()
+        # print(f"Database error: {err}")
+        print("Fail")
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
 
 def insertMovie(args) -> bool:
     print("running insertMovie")

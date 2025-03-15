@@ -13,3 +13,4 @@ STEPS TO TEST test_data AND USE LOCAL MySQL DATABASE
     - CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY 'password';
       GRANT ALL PRIVILEGES ON cs122a.* TO 'test'@'%';
       FLUSH PRIVILEGES;
+3. After running command in source code command line, run MySQL command in the MySQL shell to see if data has been updated.
