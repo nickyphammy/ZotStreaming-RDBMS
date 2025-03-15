@@ -15,6 +15,7 @@ def get_db_connection():
             password='password',
             database='cs122a'
         )
+        print("Connected") # Take this out at the end
         return conn
     except mysql.connector.Error as err:
         print("Fail")
@@ -27,16 +28,16 @@ def import_data(args) -> bool:
     
     folder_name = args[0]
     
-    # Print debug info
-    print(f"Current directory: {os.getcwd()}")
-    print(f"Looking for folder: {folder_name}")
-    print(f"Folder exists: {os.path.exists(folder_name)}")
-    if os.path.exists(folder_name):
-        print(f"Files in folder: {os.listdir(folder_name)}")
+    # # Print debug info
+    # print(f"Current directory: {os.getcwd()}")
+    # print(f"Looking for folder: {folder_name}")
+    # print(f"Folder exists: {os.path.exists(folder_name)}")
+    # if os.path.exists(folder_name):
+    #     print(f"Files in folder: {os.listdir(folder_name)}")
     
     # Check if folder exists
     if not os.path.exists(folder_name):
-        print("Fail - Folder not found")
+        print("Fail")
         return False
     
     # Make sure all required CSV files exist
@@ -44,7 +45,7 @@ def import_data(args) -> bool:
     for table in tables:
         file_path = os.path.join(folder_name, f"{table}.csv")
         if not os.path.exists(file_path):
-            print(f"Fail - File not found: {file_path}")
+            print("Fail")
             return False
     
     try:
@@ -186,7 +187,7 @@ def import_data(args) -> bool:
         return True
     except Exception as e:
         conn.rollback()
-        print(f"Fail - Exception: {str(e)}")
+        print("Fail")
         return False
     finally:
         if 'cursor' in locals():
@@ -194,8 +195,60 @@ def import_data(args) -> bool:
         if 'conn' in locals():
             conn.close()
 
-def insertViewer(args) -> bool:
-    print("running insertViewer")
+# Function to insert a new Viewer
+def insertViewer(args):
+    if len(args) < 12:
+        print("Fail")
+        return False
+    
+    # Parse arguments
+    uid = int(args[0])
+    email = args[1]
+    nickname = args[2]
+    street = args[3]
+    city = args[4]
+    state = args[5]
+    zip_code = args[6]
+    genres = args[7]
+    joined_date = args[8]
+    first_name = args[9]
+    last_name = args[10]
+    subscription = args[11]
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Insert into Users table first
+        insert_user_query = """
+        INSERT INTO users (uid, email, joined_date, nickname, street, city, state, zip, genres)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        user_values = (uid, email, joined_date, nickname, street, city, state, zip_code, genres)
+        cursor.execute(insert_user_query, user_values)
+        
+        # Insert into Viewers table
+        insert_viewer_query = """
+        INSERT INTO viewers (uid, subscription, first_name, last_name)
+        VALUES (%s, %s, %s, %s)
+        """
+        viewer_values = (uid, subscription, first_name, last_name)
+        cursor.execute(insert_viewer_query, viewer_values)
+        
+        # Commit the transaction
+        conn.commit()
+        print("Success")
+        return True
+    
+    except mysql.connector.Error as err:
+        # Rollback in case of error
+        conn.rollback()
+        print("Fail")
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
 
 def addGenre(args) -> bool:
     print("running addGenre")
