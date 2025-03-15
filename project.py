@@ -20,26 +20,7 @@ def get_db_connection():
         print("Fail")
         sys.exit(1)
 
-# Function to execute SQL query
-def execute_query(query, params=None, fetchall=False):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(query, params)
-        if fetchall:
-            result = cursor.fetchall()
-        else:
-            result = None
-        conn.commit()
-        return True, result
-    except mysql.connector.Error as err:
-        conn.rollback()
-        return False, None
-    finally:
-        cursor.close()
-        conn.close()
-
-def import_data(args):
+def import_data(args) -> bool:
     if len(args) != 1:
         print("Fail")
         return
@@ -211,22 +192,22 @@ def import_data(args):
         if 'conn' in locals():
             conn.close()
 
-def insertViewer(args):
+def insertViewer(args) -> bool:
     print("running insertViewer")
 
-def addGenre(args):
+def addGenre(args) -> bool:
     print("running addGenre")
 
-def deleteViewer(args):
+def deleteViewer(args) -> bool:
     print("running deleteViewer")
 
-def insertMovie(args):
+def insertMovie(args) -> bool:
     print("running insertMovie")
 
-def insertSession(args):
+def insertSession(args) -> bool:
     print("running insertSession")
 
-def updateRelease(args):
+def updateRelease(args) -> bool:
     print("running updateRelease")
 
 def listReleases(args):
