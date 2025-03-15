@@ -4,7 +4,7 @@
 
 STEPS TO TEST test_data AND USE LOCAL MySQL DATABASE
 1. Install MySQL (https://dev.mysql.com/downloads/)
-2. Setup commands in MySQL Shell
+2. Setup commands to create MySQL Database
     - \connect root@localhost
     - \sql
     - SET GLOBAL local_infile = 1;
@@ -13,4 +13,8 @@ STEPS TO TEST test_data AND USE LOCAL MySQL DATABASE
     - CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY 'password';
       GRANT ALL PRIVILEGES ON cs122a.* TO 'test'@'%';
       FLUSH PRIVILEGES;
-3. After running command in source code command line, run MySQL command in the MySQL shell to see if data has been updated.
+3. Loading the database (database already created), opening up the MySQL shell again
+    - \connect root@localhost
+    - \sql
+    - USE cs122a;
+4. After running command in source code command line, run MySQL command in the MySQL shell to see if data has been updated.

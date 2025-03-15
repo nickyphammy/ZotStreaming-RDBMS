@@ -348,7 +348,48 @@ def deleteViewer(args) -> bool:
         conn.close()
 
 def insertMovie(args) -> bool:
-    print("running insertMovie")
+    if (len(args) < 2):
+        print("Fail")
+        return False
+    rid = int(args[0])
+    website_url = args[1]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Check if the release exists
+        check_release_query = "SELECT rid FROM releases WHERE rid = %s"
+        cursor.execute(check_release_query, (rid,))
+        if not cursor.fetchone():
+            # Release doesn't exist
+            print("Fail")
+            return False
+        
+        # Insert into movies table
+        insert_movie_query = """
+        INSERT INTO movies (rid, website_url)
+        VALUES (%s, %s)
+        """
+        movie_values = (rid, website_url)
+        cursor.execute(insert_movie_query, movie_values)
+        
+        # Commit the transaction
+        conn.commit()
+        print("Success")
+        return True
+    
+    except mysql.connector.Error as err:
+        # Rollback in case of error
+        conn.rollback()
+        # For debugging - comment this out in production
+        print(f"Database error: {err}")
+        print("Fail")
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
 
 def insertSession(args) -> bool:
     print("running insertSession")
