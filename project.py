@@ -196,7 +196,7 @@ def import_data(args) -> bool:
             conn.close()
 
 # Function to insert a new Viewer
-def insertViewer(args):
+def insertViewer(args) -> bool:
     if len(args) < 12:
         print("Fail")
         return False
@@ -250,8 +250,63 @@ def insertViewer(args):
         cursor.close()
         conn.close()
 
+# Function to add a genre to a user
 def addGenre(args) -> bool:
-    print("running addGenre")
+    if len(args) < 2:
+        print("Fail")
+        return False
+    
+    # Parse arguments
+    uid = int(args[0])
+    new_genre = args[1]
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # First, get the current genres for the user
+        get_genres_query = "SELECT genres FROM users WHERE uid = %s"
+        cursor.execute(get_genres_query, (uid,))
+        result = cursor.fetchone()
+        
+        if not result:
+            # User not found
+            print("Fail")
+            return False
+            
+        current_genres = result[0] # Index 0 because fetchone() returns a tuple of values, and we are only dealing with the single value in the tuple
+        
+        # Update the genres list
+        if not current_genres:
+            # If the user has no genres yet
+            updated_genres = new_genre
+        else:
+            # Split the current genres and check if the new genre already exists
+            genres_list = current_genres.split(';')
+            if new_genre.lower() not in [g.lower() for g in genres_list]:
+                # Only add if it doesn't already exist (case-insensitive check)
+                updated_genres = current_genres + ';' + new_genre
+            else:
+                # Genre already exists, no update needed
+                updated_genres = current_genres
+        
+        # Update the user's genres
+        update_query = "UPDATE users SET genres = %s WHERE uid = %s"
+        cursor.execute(update_query, (updated_genres, uid))
+        
+        conn.commit()
+        print("Success")
+        return True
+    
+    except mysql.connector.Error as err:
+        # Rollback in case of error
+        conn.rollback()
+        print("Fail")
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
 
 def deleteViewer(args) -> bool:
     print("running deleteViewer")
