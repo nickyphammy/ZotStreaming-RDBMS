@@ -15,7 +15,6 @@ def get_db_connection():
             password='password',
             database='cs122a'
         )
-        print("Connected") # Take this out at the end
         return conn
     except mysql.connector.Error as err:
         print("Fail")
@@ -27,13 +26,6 @@ def import_data(args) -> bool:
         return False
     
     folder_name = args[0]
-    
-    # # Print debug info
-    # print(f"Current directory: {os.getcwd()}")
-    # print(f"Looking for folder: {folder_name}")
-    # print(f"Folder exists: {os.path.exists(folder_name)}")
-    # if os.path.exists(folder_name):
-    #     print(f"Files in folder: {os.listdir(folder_name)}")
     
     # Check if folder exists
     if not os.path.exists(folder_name):
@@ -51,6 +43,8 @@ def import_data(args) -> bool:
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
         
         # Drop existing tables if they exist (in reverse order of creation to handle foreign key constraints)
         drop_tables = ["reviews", "sessions", "videos", "series", "movies", "releases", "viewers", "producers", "users"]
@@ -60,7 +54,7 @@ def import_data(args) -> bool:
         # Create tables based on the ER diagram
         ddl_statements = [
             """
-            CREATE TABLE Users (
+            CREATE TABLE users (
                 uid INT,
                 email TEXT NOT NULL,
                 joined_date DATE NOT NULL,
@@ -74,63 +68,63 @@ def import_data(args) -> bool:
             )
             """,
             """
-            CREATE TABLE Producers (
+            CREATE TABLE producers (
                 uid INT,
                 bio TEXT,
                 company TEXT,
                 PRIMARY KEY (uid),
-                FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
+                FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
             )
             """,
             """
-            CREATE TABLE Viewers (
+            CREATE TABLE viewers (
                 uid INT,
                 subscription ENUM('free', 'monthly', 'yearly'),
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
                 PRIMARY KEY (uid),
-                FOREIGN KEY (uid) REFERENCES Users(uid) ON DELETE CASCADE
+                FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
             )
             """,
             """
-            CREATE TABLE Releases (
+            CREATE TABLE releases (
                 rid INT,
                 producer_uid INT NOT NULL,
                 title TEXT NOT NULL,
                 genre TEXT NOT NULL,
                 release_date DATE NOT NULL,
                 PRIMARY KEY (rid),
-                FOREIGN KEY (producer_uid) REFERENCES Producers(uid) ON DELETE CASCADE
+                FOREIGN KEY (producer_uid) REFERENCES producers(uid) ON DELETE CASCADE
             )
             """,
             """
-            CREATE TABLE Movies (
+            CREATE TABLE movies (
                 rid INT,
                 website_url TEXT,
                 PRIMARY KEY (rid),
-                FOREIGN KEY (rid) REFERENCES Releases(rid) ON DELETE CASCADE
+                FOREIGN KEY (rid) REFERENCES releases(rid) ON DELETE CASCADE
             )
             """,
             """
-            CREATE TABLE Series (
+            CREATE TABLE series (
                 rid INT,
                 introduction TEXT,
                 PRIMARY KEY (rid),
-                FOREIGN KEY (rid) REFERENCES Releases(rid) ON DELETE CASCADE
+                FOREIGN KEY (rid) REFERENCES releases(rid) ON DELETE CASCADE
             )
             """,
             """
-            CREATE TABLE Videos (
+            CREATE TABLE videos (
                 rid INT,
                 ep_num INT NOT NULL,
                 title TEXT NOT NULL,
                 length INT NOT NULL,
                 PRIMARY KEY (rid, ep_num),
-                FOREIGN KEY (rid) REFERENCES Releases(rid) ON DELETE CASCADE
+                FOREIGN KEY (rid) REFERENCES releases(rid) ON DELETE CASCADE
             )
             """,
             """
-            CREATE TABLE Sessions (
+            CREATE TABLE sessions (
                 sid INT,
                 uid INT NOT NULL,
                 rid INT NOT NULL,
@@ -140,12 +134,12 @@ def import_data(args) -> bool:
                 quality ENUM('480p', '720p', '1080p'),
                 device ENUM('mobile', 'desktop'),
                 PRIMARY KEY (sid),
-                FOREIGN KEY (uid) REFERENCES Viewers(uid) ON DELETE CASCADE,
-                FOREIGN KEY (rid, ep_num) REFERENCES Videos(rid, ep_num) ON DELETE CASCADE
+                FOREIGN KEY (uid) REFERENCES viewers(uid) ON DELETE CASCADE,
+                FOREIGN KEY (rid, ep_num) REFERENCES videos(rid, ep_num) ON DELETE CASCADE
             )
             """,
             """
-            CREATE TABLE Reviews (
+            CREATE TABLE reviews (
                 rvid INT,
                 uid INT NOT NULL,
                 rid INT NOT NULL,
@@ -153,8 +147,8 @@ def import_data(args) -> bool:
                 body TEXT,
                 posted_at DATETIME NOT NULL,
                 PRIMARY KEY (rvid),
-                FOREIGN KEY (uid) REFERENCES Viewers(uid) ON DELETE CASCADE,
-                FOREIGN KEY (rid) REFERENCES Releases(rid) ON DELETE CASCADE
+                FOREIGN KEY (uid) REFERENCES viewers(uid) ON DELETE CASCADE,
+                FOREIGN KEY (rid) REFERENCES releases(rid) ON DELETE CASCADE
             )
             """
         ]
@@ -162,6 +156,8 @@ def import_data(args) -> bool:
         for statement in ddl_statements:
             cursor.execute(statement)
         
+        cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+
         # Load data from CSV files
         for table in tables:
             file_path = os.path.join(folder_name, f"{table}.csv")
@@ -219,6 +215,14 @@ def insertViewer(args) -> bool:
     cursor = conn.cursor()
     
     try:
+        # Check if user already exists
+        check_user_query = "SELECT uid FROM users WHERE uid = %s"
+        cursor.execute(check_user_query, (uid,))
+        if cursor.fetchone():
+            # User already exists
+            print("Fail")
+            return False
+
         # Insert into Users table first
         insert_user_query = """
         INSERT INTO users (uid, email, joined_date, nickname, street, city, state, zip, genres)
@@ -243,6 +247,8 @@ def insertViewer(args) -> bool:
     except mysql.connector.Error as err:
         # Rollback in case of error
         conn.rollback()
+        # Print debug statement
+        # print(f'Error with inserting viewer, {err}')
         print("Fail")
         return False
     
@@ -274,10 +280,10 @@ def addGenre(args) -> bool:
             print("Fail")
             return False
             
-        current_genres = result[0] # Index 0 because fetchone() returns a tuple of values, and we are only dealing with the single value in the tuple
+        current_genres = result[0] # Index 0 because fetchone() returns a tuple of values
         
         # Update the genres list
-        if not current_genres:
+        if current_genres is None or current_genres == '':
             # If the user has no genres yet
             updated_genres = new_genre
         else:
@@ -294,9 +300,15 @@ def addGenre(args) -> bool:
         update_query = "UPDATE users SET genres = %s WHERE uid = %s"
         cursor.execute(update_query, (updated_genres, uid))
         
-        conn.commit()
-        print("Success")
-        return True
+        # Check if the update was successful (rows affected)
+        if cursor.rowcount > 0:
+            conn.commit()
+            print("Success")
+            return True
+        else:
+            conn.rollback()
+            print("Fail")
+            return False
     
     except mysql.connector.Error as err:
         # Rollback in case of error
@@ -382,7 +394,7 @@ def insertMovie(args) -> bool:
     except mysql.connector.Error as err:
         # Rollback in case of error
         conn.rollback()
-        # For debugging - comment this out in production
+        # For debugging
         print(f"Database error: {err}")
         print("Fail")
         return False
