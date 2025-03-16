@@ -597,10 +597,16 @@ def popularRelease(args):
         return False
     try:
         N = int(args[0])
+        if N <= 0:
+            print("Fail")
+            return False
     except ValueError:
         print("Fail")
         return False
     conn = get_db_connection()
+    if conn is None:
+        print("Fail")
+        return False
     cursor = conn.cursor()
     try:
         query = """
@@ -615,11 +621,14 @@ def popularRelease(args):
         """
         cursor.execute(query, (N,))
         results = cursor.fetchall()
+        if not results:
+            print("Fail")
+            return False
         for row in results:
             print(f"{row[0]}, {row[1].strip()}, {row[2]}")
         return True
-    except mysql.connector.Error:
-        print("Fail")
+    except mysql.connector.Error as err:
+        print("Fail: {err}")
         return False
     finally:
         cursor.close()
