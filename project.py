@@ -406,6 +406,64 @@ def insertMovie(args) -> bool:
 def insertSession(args) -> bool:
     print("running insertSession")
 
+    #FUNCTION PROCEDURE
+
+    #check if the arg length is correct
+    if (len(args) != 8):
+        print("Fail")
+        return False
+    
+    #store all arguments
+    sid = args[0]
+    uid = args[1]
+    rid = args[2]
+    ep_num = args[3]
+    initiate_at = args[4]
+    leave_at = args[5]
+    quality = args[6]
+    device = args[7]
+
+    #establish connection and create sql cursor
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    #execute the cursor, handle exceptions with try
+
+    try:
+        pass
+        # Check if the X exists
+        check_session_query = "SELECT sid FROM releases WHERE sid = %s"
+        cursor.execute(check_session_query, (sid,))
+        if not cursor.fetchone():
+            # X doesn't exist
+            print("Fail")
+            return False
+        
+        # Insert into X table
+        insert_session_query = """
+        INSERT INTO sessions (sid, uid, rid, ep_num, initiate_at, leave_at, quality, device)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s,)
+        """
+        session_values = (sid, uid, rid, ep_num, initiate_at, leave_at, quality, device)
+        cursor.execute(insert_session_query, session_values)
+        
+        # Commit the transaction
+        conn.commit()
+        print("Success")
+        return True
+    
+    except mysql.connector.Error as err:
+        # Rollback in case of error
+        conn.rollback()
+        # For debugging
+        print(f"Database error: {err}")
+        print("Fail")
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
 def updateRelease(args) -> bool:
     print("running updateRelease")
 
