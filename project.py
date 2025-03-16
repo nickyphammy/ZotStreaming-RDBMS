@@ -439,8 +439,8 @@ def insertSession(args) -> bool:
             print("Fail, DNE")
             return False
         
-        check_release_query = "SELECT rid FROM releases WHERE rid = %s"
-        cursor.execute(check_release_query, (rid,))
+        check_release_query = "SELECT rid, ep_num FROM releases, videos WHERE rid = %s AND ep_num = %s"
+        cursor.execute(check_release_query, (rid, ep_num, ))
         if not cursor.fetchone():
             # X doesn't exist
             print("Fail, DNE")
