@@ -541,13 +541,53 @@ def updateRelease(args) -> bool:
         conn.close()
     
 
-
-
-    
-
-
 def listReleases(args):
-    print("running listReleases")
+    #print("running listReleases")
+    
+    #store all arguments
+    uid = args[0]
+
+    #establish connection and create sql cursor
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        #check if the viewer exists
+        check_viewer_query = "SELECT uid FROM viewers WHERE uid = %s"
+        cursor.execute(check_viewer_query, (uid,))
+        if not cursor.fetchone():
+            # X doesn't exist
+            print("Fail")
+            return False
+        
+        # Query X table
+        list_viewer_query = """
+            SELECT DISTINCT r.rid, r.title
+            FROM reviews rv
+            JOIN releases r ON rv.rid = r.rid
+            WHERE rv.uid = %s
+            ORDER BY r.title ASC;       
+            """
+        viewer_values = (uid, )
+        cursor.execute(list_viewer_query, viewer_values)
+        list_releases = cursor.fetchall()
+
+        for row in results:
+            print(','.join(map(str, row)))
+        
+
+    except mysql.connector.Error as err:
+        # Rollback in case of error
+        conn.rollback()
+        # For debugging
+        print(f"Database error: {err}")
+        print("Fail")
+        
+    
+    finally:
+        cursor.close()
+        conn.close()
+
 
 def popularRelease(args):
     print("running popularRelease")
