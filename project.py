@@ -432,8 +432,8 @@ def insertSession(args) -> bool:
     #execute the cursor, handle exceptions with try
     try:
         # Check if the dependencies exist
-        check_user_query = "SELECT uid FROM users WHERE uid = %s"
-        cursor.execute(check_user_query, (uid,))
+        check_viewer_query = "SELECT uid FROM viewers WHERE uid = %s"
+        cursor.execute(check_viewer_query, (uid,))
         if not cursor.fetchone():
             # X doesn't exist
             print("Fail, DNE")
