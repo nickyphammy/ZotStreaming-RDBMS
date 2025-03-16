@@ -410,7 +410,7 @@ def insertSession(args) -> bool:
 
     #check if the arg length is correct
     if (len(args) != 8):
-        print("Fail")
+        print("Fail, not enough args")
         return False
     
     #store all arguments
@@ -437,7 +437,7 @@ def insertSession(args) -> bool:
         cursor.execute(check_session_query, (sid,))
         if not cursor.fetchone():
             # X doesn't exist
-            print("Fail")
+            print("Fail, DNE")
             return False
         
         # Insert into X table
@@ -458,7 +458,7 @@ def insertSession(args) -> bool:
         conn.rollback()
         # For debugging
         print(f"Database error: {err}")
-        print("Fail")
+        print("Fail, DB error")
         return False
     
     finally:
