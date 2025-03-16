@@ -553,11 +553,11 @@ def listReleases(args):
 
     try:
         #check if the viewer exists
-        check_viewer_query = "SELECT uid FROM viewers WHERE uid = %s"
-        cursor.execute(check_viewer_query, (uid,))
-        if not cursor.fetchone():
-            # X doesn't exist
-            raise Exception
+        # check_viewer_query = "SELECT uid FROM viewers WHERE uid = %s"
+        # cursor.execute(check_viewer_query, (uid,))
+        # if not cursor.fetchone():
+        #     # X doesn't exist
+        #     raise Exception
         
         # Query X table
         list_viewer_query = """
