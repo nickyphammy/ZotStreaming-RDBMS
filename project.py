@@ -410,7 +410,7 @@ def insertSession(args) -> bool:
 
     #check if the arg length is correct
     if (len(args) != 8):
-        print("Fail, not enough args")
+        print("Fail")
         return False
     
     #store all arguments
@@ -436,20 +436,20 @@ def insertSession(args) -> bool:
         cursor.execute(check_viewer_query, (uid,))
         if not cursor.fetchone():
             # X doesn't exist
-            print("Fail, DNE")
+            print("Fail")
             return False
         
         check_release_query = "SELECT rid FROM releases WHERE rid = %s"
         cursor.execute(check_release_query, (rid,))
         if not cursor.fetchone():
-            print("Fail, release DNE")
+            print("Fail")
             return False
         
         check_video_query = "SELECT rid, ep_num FROM videos WHERE rid = %s AND ep_num = %s"
         cursor.execute(check_video_query, (rid, ep_num, ))
         if not cursor.fetchone():
             # X doesn't exist
-            print("Fail, DNE")
+            print("Fail")
             return False
         
         valid_qualities = {'480p', '720p', '1080p'}
@@ -473,7 +473,7 @@ def insertSession(args) -> bool:
         
         # Commit the transaction
         conn.commit()
-        #print("Success")
+        print("Success")
         return True
     
     except mysql.connector.Error as err:
