@@ -553,6 +553,9 @@ def listReleases(args):
 
     try:
         #check if the viewer exists
+
+        #DIDNT NEED THIS BECAUSE IT SHOULD BE ABLE TO QUERY ANYWAYS
+        #TEST WORKED AFTER I COMMENTED THIS OUT
         # check_viewer_query = "SELECT uid FROM viewers WHERE uid = %s"
         # cursor.execute(check_viewer_query, (uid,))
         # if not cursor.fetchone():
@@ -571,6 +574,7 @@ def listReleases(args):
         cursor.execute(list_viewer_query, viewer_values)
         list_releases = cursor.fetchall()
 
+        #NEED TO FIX FORMATTING, WONT WORK FOR SOME REASON
         for row in list_releases:
             print(str(row[0]) + ',' + str(row[1]))
         
