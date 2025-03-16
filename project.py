@@ -564,7 +564,7 @@ def listReleases(args):
         
         # Query X table
         list_viewer_query = """
-            SELECT DISTINCT r.rid, r.title
+            SELECT DISTINCT r.rid, r.genre, r.title
             FROM reviews rv
             JOIN releases r ON rv.rid = r.rid
             WHERE rv.uid = %s
@@ -574,9 +574,8 @@ def listReleases(args):
         cursor.execute(list_viewer_query, viewer_values)
         list_releases = cursor.fetchall()
 
-        #NEED TO FIX FORMATTING, WONT WORK FOR SOME REASON
         for row in list_releases:
-            print(str(row[0]) + ',' + str(row[1]))
+            print(str(row[0]) + ',' + str(row[1]) + ',' + str(row[2]))
         
 
     except Exception as err:
