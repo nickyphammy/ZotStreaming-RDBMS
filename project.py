@@ -557,8 +557,7 @@ def listReleases(args):
         cursor.execute(check_viewer_query, (uid,))
         if not cursor.fetchone():
             # X doesn't exist
-            print("Fail")
-            return False
+            raise Exception
         
         # Query X table
         list_viewer_query = """
@@ -576,7 +575,7 @@ def listReleases(args):
             print(str(row[0]) + ',' + str(row[1]))
         
 
-    except mysql.connector.Error as err:
+    except Exception as err:
         # Rollback in case of error
         conn.rollback()
         # For debugging
