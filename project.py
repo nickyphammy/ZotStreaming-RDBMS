@@ -439,11 +439,27 @@ def insertSession(args) -> bool:
             print("Fail, DNE")
             return False
         
-        check_release_query = "SELECT rid, ep_num FROM videos WHERE rid = %s AND ep_num = %s"
-        cursor.execute(check_release_query, (rid, ep_num, ))
+        check_release_query = "SELECT rid FROM releases WHERE rid = %s"
+        cursor.execute(check_release_query, (rid,))
+        if not cursor.fetchone():
+            print("Fail, release DNE")
+            return False
+        
+        check_video_query = "SELECT rid, ep_num FROM videos WHERE rid = %s AND ep_num = %s"
+        cursor.execute(check_video_query, (rid, ep_num, ))
         if not cursor.fetchone():
             # X doesn't exist
             print("Fail, DNE")
+            return False
+        
+        valid_qualities = {'480p', '720p', '1080p'}
+        valid_devices = {'mobile', 'desktop'}
+
+        if quality not in valid_qualities:
+            print("Fail, invalid quality")
+            return False
+        if device not in valid_devices:
+            print("Fail, invalid device")
             return False
         
         
