@@ -433,8 +433,8 @@ def insertSession(args) -> bool:
     try:
         pass
         # Check if the X exists
-        check_session_query = "SELECT sid FROM sessions WHERE sid = %s"
-        cursor.execute(check_session_query, (sid,))
+        check_session_query = "SELECT uid FROM users WHERE uid = %s"
+        cursor.execute(check_session_query, (uid,))
         if not cursor.fetchone():
             # X doesn't exist
             print("Fail, DNE")
