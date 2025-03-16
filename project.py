@@ -404,7 +404,7 @@ def insertMovie(args) -> bool:
         conn.close()
 
 def insertSession(args) -> bool:
-    print("running insertSession")
+    #print("running insertSession")
 
     #FUNCTION PROCEDURE
 
@@ -432,7 +432,7 @@ def insertSession(args) -> bool:
     #execute the cursor, handle exceptions with try
     try:
         pass
-        # Check if the X exists
+        # Check if the dependencies exist
         check_session_query = "SELECT uid FROM users WHERE uid = %s"
         cursor.execute(check_session_query, (uid,))
         if not cursor.fetchone():
@@ -450,7 +450,7 @@ def insertSession(args) -> bool:
         
         # Commit the transaction
         conn.commit()
-        print("Success")
+        #print("Success")
         return True
     
     except mysql.connector.Error as err:
