@@ -423,16 +423,17 @@ def insertSession(args) -> bool:
     quality = args[6]
     device = args[7]
 
+    
+
     #establish connection and create sql cursor
     conn = get_db_connection()
     cursor = conn.cursor()
 
     #execute the cursor, handle exceptions with try
-
     try:
         pass
         # Check if the X exists
-        check_session_query = "SELECT sid FROM releases WHERE sid = %s"
+        check_session_query = "SELECT sid FROM sessions WHERE sid = %s"
         cursor.execute(check_session_query, (sid,))
         if not cursor.fetchone():
             # X doesn't exist
