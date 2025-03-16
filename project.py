@@ -431,14 +431,21 @@ def insertSession(args) -> bool:
 
     #execute the cursor, handle exceptions with try
     try:
-        pass
         # Check if the dependencies exist
-        check_session_query = "SELECT uid FROM users WHERE uid = %s"
-        cursor.execute(check_session_query, (uid,))
+        check_user_query = "SELECT uid FROM users WHERE uid = %s"
+        cursor.execute(check_user_query, (uid,))
         if not cursor.fetchone():
             # X doesn't exist
             print("Fail, DNE")
             return False
+        
+        check_release_query = "SELECT rid FROM releases WHERE rid = %s"
+        cursor.execute(check_release_query, (rid,))
+        if not cursor.fetchone():
+            # X doesn't exist
+            print("Fail, DNE")
+            return False
+        
         
         # Insert into X table
         insert_session_query = """
