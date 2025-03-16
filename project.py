@@ -423,7 +423,6 @@ def insertSession(args) -> bool:
     quality = args[6]
     device = args[7]
 
-    
 
     #establish connection and create sql cursor
     conn = get_db_connection()
@@ -481,7 +480,7 @@ def insertSession(args) -> bool:
         conn.rollback()
         # For debugging
         print(f"Database error: {err}")
-        print("Fail, DB error")
+        print("Fail")
         return False
     
     finally:
@@ -489,7 +488,63 @@ def insertSession(args) -> bool:
         conn.close()
 
 def updateRelease(args) -> bool:
-    print("running updateRelease")
+    #print("running updateRelease")
+
+    #FUNCTION PROCEDURE
+
+    #check if the arg length is correct
+    if (len(args) != 2):
+        print("Fail")
+        return False
+    
+    #store all arguments
+    rid = args[0]
+    title = args[1]
+
+    #establish connection and create sql cursor
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+
+    try:
+        # Check if the dependencies exist
+        check_release_query = "SELECT rid FROM releases WHERE rid = %s"
+        cursor.execute(check_release_query, (rid,))
+        if not cursor.fetchone():
+            # X doesn't exist
+            print("Fail")
+            return False
+        
+
+        # Update X table
+        update_release_query = """
+        UPDATE releases SET title = %s WHERE rid = %s
+        """
+        release_values = (title, rid)
+        cursor.execute(update_release_query, release_values)
+        
+        # Commit the transaction
+        conn.commit()
+        print("Success")
+        return True
+
+    except mysql.connector.Error as err:
+        # Rollback in case of error
+        conn.rollback()
+        # For debugging
+        #print(f"Database error: {err}")
+        print("Fail")
+        return False
+
+    finally:
+        cursor.close()
+        conn.close()
+    
+
+
+
+    
+
 
 def listReleases(args):
     print("running listReleases")
