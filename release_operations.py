@@ -168,6 +168,42 @@ def popularRelease(args):
 
 
 def releaseTitle(args):
+    if len(args) != 1:
+        print("Fail")
+        return False
+    
+    sid = int(args[0])
 
-    print("running releaseTitle")
-    return False 
+    try: 
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT r.rid, r.title, r.genre, v.title, v.ep_num, v.length
+            FROM sessions s
+            JOIN videos v ON s.rid = v.rid AND s.ep_num = v.ep_num
+            JOIN releases r ON v.rid = r.rid
+            WHERE s.sid = %s
+        """
+
+        cursor.execute(query, (sid,))
+        result = cursor.fetchone()
+        
+        if result:
+            print(f"{result[0]},{result[1]},{result[2]},{result[3]},{result[4]},{result[5]}")
+            return True
+        else:
+            print("Fail")
+            return False
+
+    except Exception as e:
+        print(f"Fail")
+        return False
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    
+    
