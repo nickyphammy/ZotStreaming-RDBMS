@@ -628,7 +628,7 @@ def popularRelease(args):
             print(f"{row[0]}, {row[1].strip()}, {row[2]}")
         return True
     except mysql.connector.Error as err:
-        print("Fail: {err}")
+        print(f"Fail: {str(err)}")
         return False
     finally:
         cursor.close()
