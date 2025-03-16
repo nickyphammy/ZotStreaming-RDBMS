@@ -604,7 +604,7 @@ def popularRelease(args):
     cursor = conn.cursor()
     try:
         query = """
-            SELECT r.rid, r.title, COUNT(rv.rvid) 
+            SELECT r.rid, r.title, IFFULL(COUNT(rv.rvid), 0)
                 AS reviewCount
             FROM releases r
             LEFT JOIN reviews rv
@@ -616,7 +616,7 @@ def popularRelease(args):
         cursor.execute(query, (N,))
         results = cursor.fetchall()
         for row in results:
-            print(f"{row[0]}, {row[1]}, {row[2]}")
+            print(f"{row[0]}, {row[1].strip()}, {row[2]}")
         return True
     except mysql.connector.Error:
         print("Fail")
