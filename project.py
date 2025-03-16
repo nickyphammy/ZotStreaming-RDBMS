@@ -443,7 +443,7 @@ def insertSession(args) -> bool:
         # Insert into X table
         insert_session_query = """
         INSERT INTO sessions (sid, uid, rid, ep_num, initiate_at, leave_at, quality, device)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s,)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         session_values = (sid, uid, rid, ep_num, initiate_at, leave_at, quality, device)
         cursor.execute(insert_session_query, session_values)
