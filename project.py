@@ -610,7 +610,7 @@ def popularRelease(args):
     cursor = conn.cursor()
     try:
         query = """
-            SELECT r.rid, r.title, IFFULL(COUNT(rv.rvid), 0)
+            SELECT r.rid, r.title, COALESCE(COUNT(rv.rvid), 0)
                 AS reviewCount
             FROM releases r
             LEFT JOIN reviews rv
