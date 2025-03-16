@@ -638,7 +638,69 @@ def releaseTitle(args):
     print("running releaseTitle")
 
 def activeViewer(args):
-    print("running activeViewer")
+    if len(args) != 3:
+        print("Fail")
+        return False
+    
+    # Initialize cursor and conn to None
+    cursor = None
+    conn = None
+    
+    try:
+        N = int(args[0])
+        start_date = args[1]
+        end_date = args[2]
+        
+        if N < 1:
+            print("Fail")
+            return False
+        
+        try:
+            if ' ' in start_date:
+                start_date = start_date.split(' ')[0]
+            if ' ' in end_date:
+                end_date = end_date.split(' ')[0]
+                
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+            
+            if end_date_obj < start_date_obj:
+                print("Fail")
+                return False
+            
+        except ValueError as e:
+            print(f"Fail: {e}")
+            return False
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        query = """
+            SELECT v.uid, v.first_name, v.last_name
+            FROM viewers v
+            JOIN sessions s ON v.uid = s.uid
+            WHERE DATE(s.initiate_at) >= %s AND DATE(s.initiate_at) <= %s
+            GROUP BY v.uid, v.first_name, v.last_name
+            HAVING COUNT(s.sid) >= %s
+            ORDER BY v.uid ASC
+        """
+        
+        cursor.execute(query, (start_date, end_date, N))
+        results = cursor.fetchall()
+        
+        for row in results:
+            print(f"{row[0]},{row[1]},{row[2]}")
+        
+        return True
+        
+    except Exception as err:
+        print("Fail")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 def videosViewed(args):
     print("running videosViewed")
