@@ -613,6 +613,11 @@ def popularRelease(args):
             ORDER BY reviewCount DESC, r.rid ASC
             LIMIT %s
         """
+        cursor.execute(query, (N,))
+        results = cursor.fetchall()
+        for row in results:
+            print(f"{row[0]}, {row[1]}, {row[2]}")
+        return True
     except mysql.connector.Error:
         print("Fail")
         return False
