@@ -75,6 +75,42 @@ def insertSession(args) -> bool:
 
 
 def videosViewed(args):
-    # Placeholder for videosViewed function
-    print("running videosViewed")
-    return False 
+
+    if len(args) != 1:
+        print("Fail")
+        return False
+    
+    rid = int(args[0])
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT v.rid, v.ep_num, v.title, v.length, COUNT(DISTINCT s.uid) AS num_sessions 
+            FROM videos v
+            JOIN sessions s ON v.rid = s.rid
+            WHERE v.rid = %s
+            GROUP BY v.rid, v.ep_num, v.title, v.length
+            ORDER BY v.rid DESC
+        """
+
+        cursor.execute(query, (rid,))
+        results = cursor.fetchall()
+
+        if not results:
+            print("Fail")
+            return False
+
+        for row in results:
+            print(f"{row[0]},{row[1]},{row[2]},{row[3]},{row[4]}")
+
+    except Exception as e:
+        print("Fail") 
+        return False
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
