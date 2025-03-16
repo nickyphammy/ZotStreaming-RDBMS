@@ -592,7 +592,33 @@ def listReleases(args):
 
 
 def popularRelease(args):
-    print("running popularRelease")
+    if len(args) != 1:
+        print("Fail")
+        return False
+    try:
+        N = int(args[0])
+    except ValueError:
+        print("Fail")
+        return False
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        query = """
+            SELECT r.rid, r.title, COUNT(rv.rvid) 
+                AS reviewCount
+            FROM releases r
+            LEFT JOIN reviews rv
+                ON r.rid = rv.rid
+            GROUP BY r.rid, r.title
+            ORDER BY reviewCount DESC, r.rid ASC
+            LIMIT %s
+        """
+    except mysql.connector.Error:
+        print("Fail")
+        return False
+    finally:
+        cursor.close()
+        conn.close()
 
 def releaseTitle(args):
     print("running releaseTitle")
