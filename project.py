@@ -572,7 +572,7 @@ def listReleases(args):
         cursor.execute(list_viewer_query, viewer_values)
         list_releases = cursor.fetchall()
 
-        for row in results:
+        for row in list_releases:
             print(','.join(map(str, row)))
         
 
