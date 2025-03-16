@@ -573,7 +573,7 @@ def listReleases(args):
         list_releases = cursor.fetchall()
 
         for row in list_releases:
-            print(','.join(map(str, row)))
+            print(row)
         
 
     except mysql.connector.Error as err:
