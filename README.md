@@ -1,20 +1,34 @@
-# CS122A-Python-and-MySQL
+# ZotStreaming RDBMS
 
-- python -m pip install mysql-connector-python
+## CS122A project: Python and MySQL
+This project implements a command-line interface for managing the ZotStreaming platform using Python and MySQL for the CS122A database systems course.
 
-STEPS TO TEST test_data AND USE LOCAL MySQL DATABASE
-1. Install MySQL (https://dev.mysql.com/downloads/)
-2. Setup commands to create MySQL Database
-    - \connect root@localhost
-    - \sql
-    - SET GLOBAL local_infile = 1;
-    - CREATE DATABASE IF NOT EXISTS cs122a;
-      USE cs122a;
-    - CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY 'password';
-      GRANT ALL PRIVILEGES ON cs122a.* TO 'test'@'%';
-      FLUSH PRIVILEGES;
-3. Loading the database (database already created), opening up the MySQL shell again
-    - \connect root@localhost
-    - \sql
-    - USE cs122a;
-4. After running command in source code command line, run MySQL command in the MySQL shell to see if data has been updated.
+## Setup Instructions
+
+### Install required packages:
+```sh
+python -m pip install mysql-connector-python
+```
+
+### Install MySQL:
+- Download from [MySQL website](https://dev.mysql.com/downloads/)
+
+### Setup MySQL Database:
+```sql
+\connect root@localhost
+
+SET GLOBAL local_infile = 1;
+CREATE DATABASE IF NOT EXISTS cs122a; 
+USE cs122a;
+CREATE USER IF NOT EXISTS 'test'@'%' IDENTIFIED BY 'password'; 
+GRANT ALL PRIVILEGES ON cs122a.* TO 'test'@'%'; 
+FLUSH PRIVILEGES;
+```
+
+### To view database after running commands:
+```sql
+\connect root@localhost
+USE cs122a;
+```
+
+Run commands through the Python interface, then use MySQL shell to verify data has been properly updated.
