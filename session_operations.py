@@ -89,7 +89,7 @@ def videosViewed(args):
         query = """
             SELECT v.rid, v.ep_num, v.title, v.length, COUNT(DISTINCT s.uid) AS num_sessions 
             FROM videos v
-            JOIN sessions s ON v.rid = s.rid
+            Left JOIN sessions s ON v.rid = s.rid
             WHERE v.rid = %s
             GROUP BY v.rid, v.ep_num, v.title, v.length
             ORDER BY v.rid DESC
